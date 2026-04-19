@@ -1755,12 +1755,35 @@ function hideResult(id)  { document.getElementById(id).classList.remove('show');
 function showErr(id, msg){ const e=document.getElementById(id); e.innerHTML='⚠️ '+msg; e.classList.add('show'); }
 function hideErr(id)     { document.getElementById(id).classList.remove('show'); }
 
+function sanitizeJSON(str) {
+  // Walk char-by-char: replace literal control characters inside JSON strings
+  // with their escape sequences so JSON.parse doesn't choke.
+  let out = '', inStr = false, esc = false;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (esc)          { out += c; esc = false; continue; }
+    if (c === '\\' && inStr) { out += c; esc = true;  continue; }
+    if (c === '"')    { out += c; inStr = !inStr; continue; }
+    if (inStr) {
+      if      (c === '\n') { out += '\\n';  continue; }
+      else if (c === '\r') { out += '\\r';  continue; }
+      else if (c === '\t') { out += '\\t';  continue; }
+    }
+    out += c;
+  }
+  return out;
+}
+
 function parseJSON(text) {
-  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (m) return JSON.parse(m[1]);
-  const m2 = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-  if (m2) return JSON.parse(m2[1]);
-  return JSON.parse(text);
+  // 1. Try markdown code fence
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const src = fence ? fence[1] : (text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/) || [null, text])[1];
+  // 2. Direct parse
+  try { return JSON.parse(src); } catch (_) {}
+  // 3. Sanitize control chars inside strings, then parse
+  try { return JSON.parse(sanitizeJSON(src)); } catch (e) {
+    throw new Error('AI returned malformed JSON — try again. (' + e.message + ')');
+  }
 }
 
 function copyEl(id, btn) {
@@ -2407,7 +2430,7 @@ Return this exact JSON structure:
 }
 
 Make company names sound authentic (include Co., Ltd. or similar). Vary stats realistically across suppliers. The message template must reference the actual product being sourced, not generic placeholders.`,
-      3500
+      4096
     );
 
     renderSuppliers(parseJSON(raw));
