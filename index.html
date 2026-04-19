@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArbitrageIQ — Command Center</title>
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --bg:        #0b0d14;
+  --surface:   #13151f;
+  --surface2:  #1b1e2e;
+  --surface3:  #232740;
+  --border:    #272b42;
+  --border2:   #323760;
+  --accent:    #6c63ff;
+  --accent-g:  #8b5cf6;
+  --teal:      #4ecdc4;
+  --red:       #ff6b6b;
+  --green:     #4caf7d;
+  --yellow:    #f9a825;
+  --blue:      #42b6f5;
+  --text:      #e8eaf6;
+  --muted:     #7b82b0;
+  --muted2:    #4a5080;
+  --sidebar-w: 228px;
+  --header-h:  54px;
+  --r:         12px;
+  --r-sm:      8px;
+  --r-xs:      6px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  font-size: 14px;
+  overflow: hidden;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ══════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════ */
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.25s ease;
+  z-index: 150;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.logo-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+.logo-text span { color: var(--accent); }
+
+.sidebar-section {
+  padding: 18px 12px 8px;
+  flex-shrink: 0;
+}
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted2);
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  margin-bottom: 1px;
+  position: relative;
+  user-select: none;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: rgba(108,99,255,0.12);
+  color: var(--text);
+  border: 1px solid rgba(108,99,255,0.2);
+}
+.nav-item.active .nav-icon { filter: none; }
+.nav-icon {
+  width: 28px; height: 28px;
+  border-radius: var(--r-xs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ni-purple { background: rgba(108,99,255,0.15); }
+.ni-teal   { background: rgba(78,205,196,0.15); }
+.ni-blue   { background: rgba(66,182,245,0.15); }
+.ni-green  { background: rgba(76,175,125,0.15); }
+.ni-yellow { background: rgba(249,168,37,0.15); }
+.ni-red    { background: rgba(255,107,107,0.15); }
+
+.nav-badge {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 100px;
+  background: rgba(108,99,255,0.2);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 12px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.key-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.key-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.key-dot.on { background: var(--green); }
+.settings-nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.settings-nav-btn:hover { color: var(--text); border-color: var(--accent); background: rgba(108,99,255,0.06); }
+
+/* ══════════════════════════════════════════════
+   CONTENT AREA
+══════════════════════════════════════════════ */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Mobile topbar ── */
+.topbar {
+  display: none;
+  height: var(--header-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.hamburger {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 6px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-xs);
+}
+.hamburger:hover { background: var(--surface2); }
+.topbar-logo { font-size: 16px; font-weight: 700; }
+.topbar-logo span { color: var(--accent); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.topbar-key { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.topbar-key.on { background: var(--green); }
+.topbar-settings {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 6px 10px;
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* ── Page scroller ── */
+.page-scroller {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.page {
+  display: none;
+  padding: 28px 32px;
+  max-width: 960px;
+  min-height: 100%;
+  animation: fadeIn 0.2s ease;
+}
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ══════════════════════════════════════════════
+   SIDEBAR OVERLAY (MOBILE)
+══════════════════════════════════════════════ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 140;
+}
+.sidebar-overlay.open { display: block; }
+
+/* ══════════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════════ */
+
+/* Page header */
+.page-header { margin-bottom: 24px; }
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page-title-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.page-sub { color: var(--muted); font-size: 14px; }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.card-head {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-head-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Forms */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+input, textarea, select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 13px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+}
+input::placeholder, textarea::placeholder { color: var(--muted2); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+select option { background: var(--surface2); }
+
+/* Buttons */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.18s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-g) 100%);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(108,99,255,0.38);
+}
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* Spinner */
+.spin {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rotating 0.65s linear infinite;
+}
+@keyframes rotating { to { transform: rotate(360deg); } }
+
+/* Result container */
+.result { display: none; }
+.result.show { display: block; }
+
+/* Info & Error banners */
+.banner {
+  padding: 11px 15px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+.banner-info {
+  background: rgba(108,99,255,0.07);
+  border: 1px solid rgba(108,99,255,0.22);
+  color: var(--muted);
+}
+.banner-info strong { color: var(--text); }
+.banner-error {
+  background: rgba(255,107,107,0.07);
+  border: 1px solid rgba(255,107,107,0.28);
+  color: var(--red);
+}
+
+/* Stat cards */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted2); margin-bottom: 8px; }
+.stat-val { font-size: 20px; font-weight: 700; line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+/* Price row */
+.pr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.pr:last-child { border-bottom: none; }
+.pr-lbl { color: var(--muted); }
+.pr-val { font-weight: 600; }
+.c-green { color: var(--green); }
+.c-red   { color: var(--red); }
+.c-yellow{ color: var(--yellow); }
+.c-blue  { color: var(--blue); }
+.c-accent{ color: var(--accent); }
+
+/* Tags */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: var(--r-xs);
+  font-weight: 500;
+}
+.tag-purple { background: rgba(108,99,255,0.15); color: #a89cf5; }
+.tag-teal   { background: rgba(78,205,196,0.15); color: var(--teal); }
+.tag-blue   { background: rgba(66,182,245,0.15); color: var(--blue); }
+.tag-green  { background: rgba(76,175,125,0.15); color: var(--green); }
+.tag-yellow { background: rgba(249,168,37,0.15); color: var(--yellow); }
+.tag-red    { background: rgba(255,107,107,0.15); color: var(--red); }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* Badge / ROI */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-hot  { background: rgba(76,175,125,0.12); color: var(--green);  border:1px solid rgba(76,175,125,0.28); }
+.badge-mid  { background: rgba(249,168,37,0.12); color: var(--yellow); border:1px solid rgba(249,168,37,0.28); }
+.badge-low  { background: rgba(255,107,107,0.12); color: var(--red);   border:1px solid rgba(255,107,107,0.28); }
+
+/* Copy text block */
+.copy-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 13px 15px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.copy-row .copy-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); }
+.copy-row .copy-char { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+/* Listing title special */
+.listing-title { font-size: 15px; font-weight: 700; }
+
+/* Tips list */
+.tips { list-style: none; }
+.tips li {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.tips li:last-child { border-bottom: none; }
+.tips li strong { color: var(--text); }
+.tip-ico { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ══════════════════════════════════════════════
+   AGENT 1 — ARBITRAGE
+══════════════════════════════════════════════ */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+}
+.product-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.product-card::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--accent), var(--teal));
+}
+.product-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.pc-name { font-weight: 700; font-size: 14px; margin-bottom: 12px; line-height: 1.3; }
+.pc-section {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--muted2); margin: 10px 0 4px;
+}
+
+/* ══════════════════════════════════════════════
+   AGENT 3 — FB PRICING
+══════════════════════════════════════════════ */
+.price-trio {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.trio-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  text-align: center;
+}
+.trio-cell.rec {
+  border-color: var(--accent);
+  background: rgba(108,99,255,0.07);
+}
+.trio-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+.trio-val { font-size: 24px; font-weight: 700; line-height: 1; }
+.trio-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.trio-badge {
+  font-size: 9px;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 100px;
+  margin-top: 6px;
+  display: inline-block;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   AGENT 4 — PROFIT CALCULATOR
+══════════════════════════════════════════════ */
+.profit-hero {
+  background: linear-gradient(135deg, rgba(108,99,255,0.1) 0%, rgba(78,205,196,0.07) 100%);
+  border: 1px solid rgba(108,99,255,0.25);
+  border-radius: var(--r);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+.profit-hero-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+.profit-hero-val { font-size: 48px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.profit-hero-sub { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.profit-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.pm-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 13px;
+  text-align: center;
+}
+.pm-lbl { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.pm-val { font-size: 17px; font-weight: 700; }
+
+/* ══════════════════════════════════════════════
+   AGENT 5 — PRODUCT RESEARCH
+══════════════════════════════════════════════ */
+.verdict-card {
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 18px;
+  text-align: center;
+  border: 1px solid;
+}
+.verdict-worth  { background: rgba(76,175,125,0.07); border-color: rgba(76,175,125,0.3); }
+.verdict-maybe  { background: rgba(249,168,37,0.07); border-color: rgba(249,168,37,0.3); }
+.verdict-skip   { background: rgba(255,107,107,0.07); border-color: rgba(255,107,107,0.3); }
+.verdict-emoji  { font-size: 36px; margin-bottom: 8px; }
+.verdict-label  { font-size: 20px; font-weight: 800; }
+.verdict-sub    { font-size: 13px; color: var(--muted); margin-top: 5px; }
+
+.meter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.meter-name { width: 100px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.meter-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.meter-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.meter-val { width: 36px; font-size: 12px; font-weight: 700; text-align: right; flex-shrink: 0; }
+
+.research-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.rg-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px;
+}
+.rg-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted2); margin-bottom: 6px; }
+.rg-val { font-size: 14px; font-weight: 600; }
+
+/* ══════════════════════════════════════════════
+   AGENT 6 — SHIPPING ESTIMATOR
+══════════════════════════════════════════════ */
+.shipping-table { width: 100%; border-collapse: collapse; }
+.shipping-table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted2);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.shipping-table td {
+  padding: 11px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.shipping-table tr:last-child td { border-bottom: none; }
+.shipping-table tr.cheapest-row td { background: rgba(76,175,125,0.05); }
+.carrier-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.carrier-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 100px;
+  font-weight: 700;
+}
+.cheapest-tag { background: rgba(76,175,125,0.15); color: var(--green); }
+.rec-tag      { background: rgba(108,99,255,0.15); color: var(--accent); }
+.ship-days { font-size: 11px; color: var(--muted); }
+
+/* ══════════════════════════════════════════════
+   SETTINGS MODAL
+══════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 28px;
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.modal-title { font-size: 18px; font-weight: 700; }
+.modal-close {
+  background: none; border: none;
+  color: var(--muted); cursor: pointer;
+  font-size: 22px; line-height: 1; padding: 4px;
+  border-radius: 4px;
+}
+.modal-close:hover { color: var(--text); background: var(--surface2); }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.api-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-top: 8px;
+}
+.fee-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.fee-preset-btn {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.fee-preset-btn:hover { border-color: var(--accent); color: var(--text); }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .shell { flex-direction: column; }
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    transform: translateX(-100%);
+    z-index: 150;
+    height: 100%;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .content-area { height: 100vh; }
+  .topbar { display: flex; }
+  .page { padding: 16px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2,1fr); }
+  .profit-metrics { grid-template-columns: repeat(2,1fr); }
+  .price-trio { grid-template-columns: 1fr; }
+  .research-grid { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .profit-metrics { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📦</div>
+      <div class="logo-text">Arbitrage<span>IQ</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sourcing</div>
+      <div class="nav-item active" onclick="nav('arbitrage')" id="nav-arbitrage">
+        <div class="nav-icon ni-purple">🔍</div>
+        Alibaba Arbitrage
+        <span class="nav-badge">AI</span>
+      </div>
+      <div class="nav-item" onclick="nav('research')" id="nav-research">
+        <div class="nav-icon ni-blue">🔬</div>
+        Product Research
+        <span class="nav-badge">AI</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Selling</div>
+      <div class="nav-item" onclick="nav('ebay')" id="nav-ebay">
+        <div class="nav-icon ni-teal">🛒</div>
+        eBay Listing Generator
+        <span class="nav-badge">AI</span>
+      </div>
+      <div class="nav-item" onclick="nav('fb')" id="nav-fb">
+        <div class="nav-icon ni-blue">📍</div>
+        FB Marketplace Pricing
+        <span class="nav-badge">AI</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <div class="nav-item" onclick="nav('profit')" id="nav-profit">
+        <div class="nav-icon ni-green">💰</div>
+        Profit Calculator
+      </div>
+      <div class="nav-item" onclick="nav('shipping')" id="nav-shipping">
+        <div class="nav-icon ni-yellow">📦</div>
+        Shipping Estimator
+        <span class="nav-badge">AI</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="key-pill">
+        <div class="key-dot" id="sideKeyDot"></div>
+        <span id="sideKeyText" style="font-size:12px">No API key</span>
+      </div>
+      <button class="settings-nav-btn" onclick="openSettings()">⚙️ Settings</button>
+    </div>
+  </aside>
+
+  <!-- ══════════════ CONTENT AREA ══════════════ -->
+  <div class="content-area">
+
+    <!-- Mobile topbar -->
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-logo">Arbitrage<span>IQ</span></div>
+      <div class="topbar-right">
+        <div class="topbar-key" id="topKeyDot"></div>
+        <button class="topbar-settings" onclick="openSettings()">⚙️</button>
+      </div>
+    </div>
+
+    <div class="page-scroller">
+
+      <!-- ══════ PAGE: ARBITRAGE ══════ -->
+      <div class="page active" id="page-arbitrage">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(108,99,255,0.15)">🔍</div>
+            Alibaba Arbitrage Finder
+          </div>
+          <div class="page-sub">Find wholesale products you can flip on eBay & Facebook Marketplace</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot"></div> Search Parameters</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg" style="grid-column:1/-1">
+              <label>Product / Niche</label>
+              <input id="arb-query" type="text" placeholder="e.g. LED strip lights, phone cases, kitchen gadgets, bluetooth speakers…">
+            </div>
+          </div>
+          <div class="grid-3" style="margin-bottom:16px">
+            <div class="fg">
+              <label>Max Buy Price ($)</label>
+              <input id="arb-budget" type="number" value="15" min="1" placeholder="15">
+            </div>
+            <div class="fg">
+              <label>Min Target ROI (%)</label>
+              <input id="arb-roi" type="number" value="100" min="0" placeholder="100">
+            </div>
+            <div class="fg">
+              <label>Results Count</label>
+              <select id="arb-count">
+                <option value="4">4 products</option>
+                <option value="6" selected>6 products</option>
+                <option value="8">8 products</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="findArbitrage()" id="arb-btn">🔍 Find Arbitrage Deals</button>
+        </div>
+
+        <div class="stat-grid" id="arb-stats" style="display:none">
+          <div class="stat-box">
+            <div class="stat-lbl">Products Found</div>
+            <div class="stat-val" id="s-count">—</div>
+            <div class="stat-sub">opportunities</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Avg ROI</div>
+            <div class="stat-val" id="s-roi">—</div>
+            <div class="stat-sub">return on invest</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Best Profit/Unit</div>
+            <div class="stat-val" id="s-margin">—</div>
+            <div class="stat-sub">net margin</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Top Platform</div>
+            <div class="stat-val" id="s-platform" style="font-size:15px">—</div>
+            <div class="stat-sub">highest returns</div>
+          </div>
+        </div>
+
+        <div class="result" id="arb-result">
+          <div class="product-grid" id="arb-grid"></div>
+        </div>
+        <div class="banner banner-error result" id="arb-error"></div>
+      </div>
+
+      <!-- ══════ PAGE: EBAY ══════ -->
+      <div class="page" id="page-ebay">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(78,205,196,0.15)">🛒</div>
+            eBay Listing Generator
+          </div>
+          <div class="page-sub">AI-optimized titles & descriptions built for eBay's Cassini search algorithm</div>
+        </div>
+
+        <div class="banner banner-info">
+          💡 <span><strong>Pro tip:</strong> Include the brand, model number, color, and key specs for the most keyword-rich listings. More detail = higher search rank.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--teal)"></div> Product Details</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Product Name / Model</label>
+              <input id="ebay-product" type="text" placeholder="e.g. Anker 65W USB-C GaN Charger 4-Port">
+            </div>
+            <div class="fg">
+              <label>Condition</label>
+              <select id="ebay-condition">
+                <option>New</option>
+                <option>New in Box</option>
+                <option>Like New / Open Box</option>
+                <option>Good – Used</option>
+                <option>Refurbished</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Selling Price ($)</label>
+              <input id="ebay-price" type="number" placeholder="e.g. 34.99">
+            </div>
+            <div class="fg">
+              <label>Category (optional)</label>
+              <input id="ebay-category" type="text" placeholder="e.g. Consumer Electronics">
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:16px">
+            <label>Key Features (optional — one per line or comma-separated)</label>
+            <textarea id="ebay-features" placeholder="e.g. GaN technology, 65W fast charging, 4 ports, foldable prongs, USB-C PD 3.0…"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="generateListing()" id="ebay-btn">✨ Generate Listing</button>
+        </div>
+
+        <div class="result" id="ebay-result">
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--teal)"></div> Generated Listing</div>
+
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:6px">📌 eBay Title</div>
+            <div class="copy-block listing-title" id="ebay-title-text"></div>
+            <div class="copy-row">
+              <span class="copy-lbl">Title</span>
+              <span class="copy-char" id="ebay-char-count"></span>
+              <button class="btn btn-ghost btn-sm" onclick="copyEl('ebay-title-text',this)">📋 Copy</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:6px">📝 Item Description</div>
+            <div class="copy-block" id="ebay-desc-text" style="max-height:320px;overflow-y:auto"></div>
+            <div class="copy-row">
+              <span class="copy-lbl">Description</span>
+              <button class="btn btn-ghost btn-sm" onclick="copyEl('ebay-desc-text',this)">📋 Copy</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:10px">🏷️ Search Keywords</div>
+            <div class="tags" id="ebay-tags"></div>
+          </div>
+        </div>
+        <div class="banner banner-error result" id="ebay-error"></div>
+      </div>
+
+      <!-- ══════ PAGE: FACEBOOK ══════ -->
+      <div class="page" id="page-fb">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(66,182,245,0.15)">📍</div>
+            FB Marketplace Pricing
+          </div>
+          <div class="page-sub">Data-driven local pricing to maximize profit on Facebook Marketplace</div>
+        </div>
+
+        <div class="banner banner-info">
+          📍 <span><strong>Local pricing matters.</strong> FB buyers expect 20–40% less than eBay and won't pay shipping. This tool calculates the optimal price with negotiation buffer built in.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--blue)"></div> Product Info</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Product Name</label>
+              <input id="fb-product" type="text" placeholder="e.g. Apple AirPods Pro 2nd Gen">
+            </div>
+            <div class="fg">
+              <label>Condition</label>
+              <select id="fb-condition">
+                <option>New (sealed)</option>
+                <option>Like New</option>
+                <option>Good</option>
+                <option>Fair</option>
+                <option>For Parts / Not Working</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Your Cost / Buy Price ($)</label>
+              <input id="fb-cost" type="number" placeholder="e.g. 18.50">
+            </div>
+            <div class="fg">
+              <label>City / Region (optional)</label>
+              <input id="fb-location" type="text" placeholder="e.g. Miami, FL">
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:16px">
+            <label>Additional Context (optional)</label>
+            <input id="fb-context" type="text" placeholder="e.g. still sealed in box, rare colorway, bundle deal with accessories…">
+          </div>
+          <button class="btn btn-primary" onclick="fbPricing()" id="fb-btn">📍 Get Pricing Advice</button>
+        </div>
+
+        <div class="result" id="fb-result">
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--blue)"></div> Price Recommendations</div>
+            <div class="price-trio" id="fb-trio"></div>
+            <div id="fb-sub-row"></div>
+            <div class="divider"></div>
+            <div class="card-head" style="margin-bottom:12px"><div class="card-head-dot" style="background:var(--yellow)"></div> Selling Strategy</div>
+            <ul class="tips" id="fb-tips"></ul>
+          </div>
+        </div>
+        <div class="banner banner-error result" id="fb-error"></div>
+      </div>
+
+      <!-- ══════ PAGE: PROFIT CALCULATOR ══════ -->
+      <div class="page" id="page-profit">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(76,175,125,0.15)">💰</div>
+            Profit Calculator
+          </div>
+          <div class="page-sub">Calculate your real net profit after every fee, cost, and deduction</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--green)"></div> Sale Details</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg">
+              <label>What You Paid (Buy Price $)</label>
+              <input id="pc-buy" type="number" placeholder="e.g. 8.50" oninput="calcProfit()">
+            </div>
+            <div class="fg">
+              <label>What You Sold For ($)</label>
+              <input id="pc-sell" type="number" placeholder="e.g. 39.99" oninput="calcProfit()">
+            </div>
+          </div>
+
+          <div class="card-head" style="margin-top:4px"><div class="card-head-dot" style="background:var(--yellow)"></div> Platform & Fees</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Platform</label>
+              <select id="pc-platform" onchange="onPlatformChange()">
+                <option value="ebay">eBay</option>
+                <option value="fb">Facebook Marketplace</option>
+                <option value="amazon">Amazon</option>
+                <option value="mercari">Mercari</option>
+                <option value="other">Other / Manual</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Platform Fee % <span id="pc-fee-hint" style="color:var(--accent);font-weight:600"></span></label>
+              <input id="pc-fee-pct" type="number" value="13.25" step="0.01" placeholder="e.g. 13.25" oninput="calcProfit()">
+            </div>
+            <div class="fg">
+              <label>Fixed Platform Fee ($)</label>
+              <input id="pc-fee-fixed" type="number" value="0.30" step="0.01" placeholder="e.g. 0.30" oninput="calcProfit()">
+            </div>
+            <div class="fg">
+              <label>Payment Processing % (optional)</label>
+              <input id="pc-payment" type="number" value="0" step="0.01" placeholder="e.g. 2.9" oninput="calcProfit()">
+            </div>
+          </div>
+          <div class="fee-presets">
+            <div style="font-size:11px;color:var(--muted);margin-right:4px;align-self:center">Presets:</div>
+            <button class="fee-preset-btn" onclick="applyPreset('ebay')">eBay Standard</button>
+            <button class="fee-preset-btn" onclick="applyPreset('fb')">FB Marketplace</button>
+            <button class="fee-preset-btn" onclick="applyPreset('amazon')">Amazon FBA ~15%</button>
+            <button class="fee-preset-btn" onclick="applyPreset('mercari')">Mercari 10%</button>
+          </div>
+
+          <div class="divider"></div>
+          <div class="card-head"><div class="card-head-dot" style="background:var(--red)"></div> Costs</div>
+          <div class="grid-3">
+            <div class="fg">
+              <label>Shipping You Paid ($)</label>
+              <input id="pc-ship-out" type="number" value="0" step="0.01" placeholder="0.00" oninput="calcProfit()">
+            </div>
+            <div class="fg">
+              <label>Shipping Collected ($)</label>
+              <input id="pc-ship-in" type="number" value="0" step="0.01" placeholder="0.00" oninput="calcProfit()">
+            </div>
+            <div class="fg">
+              <label>Other Costs ($)</label>
+              <input id="pc-other" type="number" value="0" step="0.01" placeholder="0.00" oninput="calcProfit()">
+            </div>
+          </div>
+        </div>
+
+        <div class="result show" id="profit-result">
+          <div class="profit-hero" id="profit-hero">
+            <div class="profit-hero-label">Net Profit</div>
+            <div class="profit-hero-val" id="ph-val">$0.00</div>
+            <div class="profit-hero-sub" id="ph-sub">Enter your numbers above to calculate</div>
+          </div>
+
+          <div class="profit-metrics">
+            <div class="pm-box">
+              <div class="pm-lbl">Gross Revenue</div>
+              <div class="pm-val" id="pm-gross">$0.00</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-lbl">Total Fees</div>
+              <div class="pm-val c-red" id="pm-fees">$0.00</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-lbl">ROI</div>
+              <div class="pm-val" id="pm-roi">0%</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-lbl">Profit Margin</div>
+              <div class="pm-val" id="pm-margin">0%</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--green)"></div> Full Fee Breakdown</div>
+            <div id="pc-breakdown"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ PAGE: PRODUCT RESEARCH ══════ -->
+      <div class="page" id="page-research">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(66,182,245,0.15)">🔬</div>
+            Product Research
+          </div>
+          <div class="page-sub">AI analysis of demand, competition, and flip potential before you buy</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--blue)"></div> Describe the Product</div>
+          <div class="fg" style="margin-bottom:14px">
+            <label>Product Description</label>
+            <textarea id="res-product" rows="3" placeholder="e.g. Portable mini projector from Alibaba, 1080p native resolution, WiFi + Bluetooth, 200 ANSI lumens, about $35 wholesale. Thinking of selling on eBay and FB Marketplace…"></textarea>
+          </div>
+          <div class="grid-3" style="margin-bottom:16px">
+            <div class="fg">
+              <label>Your Buy Price ($) (optional)</label>
+              <input id="res-cost" type="number" placeholder="e.g. 35">
+            </div>
+            <div class="fg">
+              <label>Target Platform</label>
+              <select id="res-platform">
+                <option value="both">eBay + FB Marketplace</option>
+                <option value="ebay">eBay Only</option>
+                <option value="fb">FB Marketplace Only</option>
+                <option value="all">All Platforms</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Your Experience Level</label>
+              <select id="res-level">
+                <option value="beginner">Beginner Reseller</option>
+                <option value="intermediate" selected>Intermediate</option>
+                <option value="expert">Experienced Seller</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="researchProduct()" id="res-btn">🔬 Analyze Product</button>
+        </div>
+
+        <div class="result" id="res-result">
+          <div id="res-verdict-card" class="verdict-card verdict-worth">
+            <div id="res-verdict-emoji" class="verdict-emoji">✅</div>
+            <div id="res-verdict-label" class="verdict-label">Worth Flipping</div>
+            <div id="res-verdict-sub" class="verdict-sub"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--blue)"></div> Market Scores</div>
+            <div id="res-meters"></div>
+          </div>
+
+          <div class="research-grid">
+            <div class="rg-box">
+              <div class="rg-lbl">Best Platform</div>
+              <div class="rg-val" id="res-best-platform"></div>
+            </div>
+            <div class="rg-box">
+              <div class="rg-lbl">Estimated Sell Price</div>
+              <div class="rg-val c-green" id="res-sell-price"></div>
+            </div>
+            <div class="rg-box">
+              <div class="rg-lbl">Estimated Profit/Unit</div>
+              <div class="rg-val c-green" id="res-profit"></div>
+            </div>
+            <div class="rg-box">
+              <div class="rg-lbl">Avg Time to Sell</div>
+              <div class="rg-val" id="res-time"></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head"><div class="card-head-dot" style="background:var(--green)"></div> Opportunities</div>
+              <ul class="tips" id="res-pros"></ul>
+            </div>
+            <div class="card">
+              <div class="card-head"><div class="card-head-dot" style="background:var(--red)"></div> Risks & Watch-outs</div>
+              <ul class="tips" id="res-cons"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--yellow)"></div> AI Recommendation</div>
+            <div id="res-advice" style="font-size:13px;color:var(--muted);line-height:1.65"></div>
+          </div>
+        </div>
+        <div class="banner banner-error result" id="res-error"></div>
+      </div>
+
+      <!-- ══════ PAGE: SHIPPING ══════ -->
+      <div class="page" id="page-shipping">
+        <div class="page-header">
+          <div class="page-title">
+            <div class="page-title-icon" style="background:rgba(249,168,37,0.15)">📦</div>
+            Shipping Estimator
+          </div>
+          <div class="page-sub">Compare carrier rates for eBay shipments vs. local pickup savings</div>
+        </div>
+
+        <div class="banner banner-info">
+          📮 <span><strong>Note:</strong> Estimates are based on typical carrier rates. Actual costs depend on your zip code, account discounts, and surcharges. eBay's discounted rates can be 30–50% cheaper than retail.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--yellow)"></div> Package Details</div>
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Package Type</label>
+              <select id="sh-type">
+                <option value="envelope">Padded Envelope / Poly Mailer</option>
+                <option value="small_box" selected>Small Box (&lt;1 cu ft)</option>
+                <option value="medium_box">Medium Box (1–2 cu ft)</option>
+                <option value="large_box">Large Box (&gt;2 cu ft)</option>
+                <option value="flat_rate">USPS Flat Rate Box</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Shipping Distance</label>
+              <select id="sh-zone">
+                <option value="local">Local (same state)</option>
+                <option value="regional" selected>Regional (1–3 states away)</option>
+                <option value="national">National (cross-country)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-3" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Weight — Pounds (lbs)</label>
+              <input id="sh-lbs" type="number" value="1" min="0" step="0.1" placeholder="1" oninput="updateDimWeight()">
+            </div>
+            <div class="fg">
+              <label>Weight — Ounces (oz)</label>
+              <input id="sh-oz" type="number" value="0" min="0" max="15" step="1" placeholder="0" oninput="updateDimWeight()">
+            </div>
+            <div class="fg">
+              <label>Total Weight</label>
+              <input id="sh-weight-display" type="text" readonly placeholder="—" style="background:var(--surface);color:var(--muted)">
+            </div>
+          </div>
+          <div class="grid-4" style="margin-bottom:14px">
+            <div class="fg">
+              <label>Length (in)</label>
+              <input id="sh-l" type="number" value="10" min="1" placeholder="10" oninput="updateDimWeight()">
+            </div>
+            <div class="fg">
+              <label>Width (in)</label>
+              <input id="sh-w" type="number" value="8" min="1" placeholder="8" oninput="updateDimWeight()">
+            </div>
+            <div class="fg">
+              <label>Height (in)</label>
+              <input id="sh-h" type="number" value="4" min="1" placeholder="4" oninput="updateDimWeight()">
+            </div>
+            <div class="fg">
+              <label>Dim Weight (lbs)</label>
+              <input id="sh-dim-weight" type="text" readonly placeholder="—" style="background:var(--surface);color:var(--accent)">
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:16px">
+            <label>Item Value for Insurance (optional $)</label>
+            <input id="sh-value" type="number" placeholder="e.g. 50">
+          </div>
+          <button class="btn btn-primary" onclick="estimateShipping()" id="sh-btn">📦 Estimate Shipping</button>
+        </div>
+
+        <div class="result" id="sh-result">
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--yellow)"></div> Carrier Rate Comparison</div>
+            <div style="overflow-x:auto">
+              <table class="shipping-table" id="sh-table">
+                <thead>
+                  <tr>
+                    <th>Carrier / Service</th>
+                    <th>Est. Cost</th>
+                    <th>Transit Time</th>
+                    <th>Best For</th>
+                  </tr>
+                </thead>
+                <tbody id="sh-tbody"></tbody>
+              </table>
+            </div>
+            <div class="divider"></div>
+            <div id="sh-advice" style="font-size:13px;color:var(--muted);line-height:1.65"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--green)"></div> Local Pickup Option</div>
+            <div id="sh-local"></div>
+          </div>
+        </div>
+        <div class="banner banner-error result" id="sh-error"></div>
+      </div>
+
+    </div><!-- /page-scroller -->
+  </div><!-- /content-area -->
+</div><!-- /shell -->
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sideOverlay" onclick="closeSidebar()"></div>
+
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">⚙️ Settings</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="fg">
+      <label>Anthropic API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…">
+      <div class="api-note">
+        Your key is saved only in your browser's <strong>localStorage</strong> — it's never stored on any server and only sent directly to Anthropic's API when you run an analysis.<br><br>
+        Get your key at <strong>console.anthropic.com</strong> → API Keys.
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <div class="key-dot" id="modalKeyDot"></div>
+        <span id="modalKeyText">No key saved</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="clearKey()">🗑 Clear Key</button>
+      <button class="btn btn-primary" onclick="saveKey()">💾 Save Key</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCRIPT ══════════════ -->
+<script>
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const MODEL   = 'claude-sonnet-4-20250514';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+function nav(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('nav-' + id).classList.add('active');
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector('.page-scroller').scrollTop = 0;
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sideOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sideOverlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+//  SETTINGS / API KEY
+// ═══════════════════════════════════════════════
+function getKey()  { return localStorage.getItem('arb_api_key') || ''; }
+function saveKey() {
+  const v = document.getElementById('apiKeyInput').value.trim();
+  if (!v) { alert('Please paste your Anthropic API key.'); return; }
+  localStorage.setItem('arb_api_key', v);
+  syncKeyStatus();
+  closeSettings();
+}
+function clearKey() {
+  localStorage.removeItem('arb_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  syncKeyStatus();
+}
+function syncKeyStatus() {
+  const has = !!getKey();
+  ['sideKeyDot','topKeyDot','modalKeyDot'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'key-dot' + (has ? ' on' : '');
+  });
+  const skt = document.getElementById('sideKeyText');
+  if (skt) skt.textContent = has ? 'API key active' : 'No API key';
+  const mkt = document.getElementById('modalKeyText');
+  if (mkt) mkt.textContent = has ? '✓ Key saved and active' : 'No key saved';
+  if (has) document.getElementById('apiKeyInput').placeholder = '••••••••••••••••••• (saved)';
+}
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('open');
+  syncKeyStatus();
+}
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+document.getElementById('settingsModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeSettings();
+});
+
+// ═══════════════════════════════════════════════
+//  CLAUDE API
+// ═══════════════════════════════════════════════
+async function callClaude(system, user, maxTokens = 2048) {
+  const key = getKey();
+  if (!key) throw new Error('No API key set — click ⚙️ Settings to add your Anthropic API key.');
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${res.status}`);
+  }
+  return (await res.json()).content[0].text;
+}
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+function setBtn(id, loading, label) {
+  const b = document.getElementById(id);
+  b.disabled = loading;
+  b.innerHTML = loading ? '<div class="spin"></div> Analyzing…' : label;
+}
+function showResult(id)  { document.getElementById(id).classList.add('show'); }
+function hideResult(id)  { document.getElementById(id).classList.remove('show'); }
+function showErr(id, msg){ const e=document.getElementById(id); e.innerHTML='⚠️ '+msg; e.classList.add('show'); }
+function hideErr(id)     { document.getElementById(id).classList.remove('show'); }
+
+function parseJSON(text) {
+  const m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (m) return JSON.parse(m[1]);
+  const m2 = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+  if (m2) return JSON.parse(m2[1]);
+  return JSON.parse(text);
+}
+
+function copyEl(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 2000);
+  });
+}
+
+function fmt(n, dec=2) { return '$' + Number(n||0).toFixed(dec); }
+function pct(n)         { return Number(n||0).toFixed(1) + '%'; }
+
+// ═══════════════════════════════════════════════
+//  AGENT 1 — ALIBABA ARBITRAGE
+// ═══════════════════════════════════════════════
+async function findArbitrage() {
+  const query  = document.getElementById('arb-query').value.trim();
+  const budget = parseFloat(document.getElementById('arb-budget').value) || 15;
+  const minROI = parseFloat(document.getElementById('arb-roi').value) || 100;
+  const count  = parseInt(document.getElementById('arb-count').value) || 6;
+  if (!query) { alert('Enter a product or niche first.'); return; }
+
+  hideErr('arb-error');
+  hideResult('arb-result');
+  document.getElementById('arb-stats').style.display = 'none';
+  setBtn('arb-btn', true, '🔍 Find Arbitrage Deals');
+
+  try {
+    const raw = await callClaude(
+      `You are an expert reselling arbitrage analyst with deep knowledge of Alibaba wholesale pricing, eBay fees, and Facebook Marketplace dynamics. Only respond with valid JSON.`,
+      `Find ${count} specific, realistic reselling arbitrage opportunities for: "${query}"
+Budget: max $${budget} buy price/unit. Minimum target ROI: ${minROI}%.
+
+Return a JSON array of exactly ${count} objects:
+[{
+  "name": "Specific product name with key specs",
+  "alibaba_price": 4.50,
+  "ebay_sell_price": 24.99,
+  "ebay_fees": 3.25,
+  "ebay_shipping_cost": 4.50,
+  "ebay_net_profit": 12.74,
+  "ebay_roi": 183,
+  "fb_sell_price": 19.00,
+  "fb_fees": 0,
+  "fb_net_profit": 14.50,
+  "fb_roi": 222,
+  "moq": 10,
+  "demand": "High",
+  "notes": "One key insight about this product"
+}]
+
+Include real product names, realistic prices, accurate eBay fee estimates (13.25% + $0.30 + shipping). Be specific.`,
+      2500
+    );
+    renderArbitrage(parseJSON(raw));
+  } catch(e) { showErr('arb-error', e.message); }
+  finally { setBtn('arb-btn', false, '🔍 Find Arbitrage Deals'); }
+}
+
+function renderArbitrage(products) {
+  let totalROI=0, bestMargin=0, ebayWins=0;
+  const grid = document.getElementById('arb-grid');
+  grid.innerHTML = '';
+
+  products.forEach(p => {
+    const bestROI = Math.max(p.ebay_roi||0, p.fb_roi||0);
+    const bm = Math.max(p.ebay_net_profit||0, p.fb_net_profit||0);
+    totalROI += bestROI;
+    if (bm > bestMargin) bestMargin = bm;
+    if ((p.ebay_roi||0) >= (p.fb_roi||0)) ebayWins++;
+    const rc = bestROI>=200?'badge-hot':bestROI>=100?'badge-mid':'badge-low';
+    const rl = bestROI>=200?'🔥 Hot Deal':bestROI>=100?'✅ Good Deal':'⚠️ Marginal';
+
+    grid.innerHTML += `
+    <div class="product-card">
+      <div class="pc-name">${p.name}</div>
+      <div class="pr"><span class="pr-lbl">🛍 Alibaba Price</span><span class="pr-val">${fmt(p.alibaba_price)}</span></div>
+      <div class="pr"><span class="pr-lbl">📦 Min Order (MOQ)</span><span class="pr-val">${p.moq||'?'} units</span></div>
+      <div class="pc-section">eBay</div>
+      <div class="pr"><span class="pr-lbl">Sell Price</span><span class="pr-val">${fmt(p.ebay_sell_price)}</span></div>
+      <div class="pr"><span class="pr-lbl">Fees + Shipping</span><span class="pr-val c-red">-${fmt((p.ebay_fees||0)+(p.ebay_shipping_cost||0))}</span></div>
+      <div class="pr"><span class="pr-lbl">Net Profit/unit</span><span class="pr-val c-green">${fmt(p.ebay_net_profit)}</span></div>
+      <div class="pr"><span class="pr-lbl">ROI</span><span class="pr-val ${(p.ebay_roi||0)>=150?'c-green':'c-yellow'}">${p.ebay_roi||0}%</span></div>
+      <div class="pc-section">Facebook Marketplace</div>
+      <div class="pr"><span class="pr-lbl">Sell Price</span><span class="pr-val">${fmt(p.fb_sell_price)}</span></div>
+      <div class="pr"><span class="pr-lbl">Net Profit/unit</span><span class="pr-val c-green">${fmt(p.fb_net_profit)}</span></div>
+      <div class="pr"><span class="pr-lbl">ROI</span><span class="pr-val ${(p.fb_roi||0)>=150?'c-green':'c-yellow'}">${p.fb_roi||0}%</span></div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="badge ${rc}">${rl} — ${bestROI}% ROI</span>
+        <span class="tag tag-green" style="font-size:10px">${p.demand||'Med'} Demand</span>
+      </div>
+      ${p.notes?`<div style="margin-top:10px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;line-height:1.5">${p.notes}</div>`:''}
+    </div>`;
+  });
+
+  document.getElementById('s-count').textContent = products.length;
+  document.getElementById('s-roi').textContent = Math.round(totalROI/products.length)+'%';
+  document.getElementById('s-margin').textContent = fmt(bestMargin);
+  document.getElementById('s-platform').textContent = ebayWins>=(products.length/2)?'eBay':'FB Mkt';
+  document.getElementById('arb-stats').style.display = 'grid';
+  showResult('arb-result');
+}
+
+// ═══════════════════════════════════════════════
+//  AGENT 2 — EBAY LISTING
+// ═══════════════════════════════════════════════
+async function generateListing() {
+  const product  = document.getElementById('ebay-product').value.trim();
+  const cond     = document.getElementById('ebay-condition').value;
+  const price    = document.getElementById('ebay-price').value;
+  const cat      = document.getElementById('ebay-category').value.trim();
+  const features = document.getElementById('ebay-features').value.trim();
+  if (!product) { alert('Enter the product name first.'); return; }
+
+  hideErr('ebay-error');
+  hideResult('ebay-result');
+  setBtn('ebay-btn', true, '✨ Generate Listing');
+
+  try {
+    const raw = await callClaude(
+      `You are a top eBay PowerSeller with expert knowledge of eBay's Cassini search algorithm, SEO, and conversion optimization. Only respond with valid JSON.`,
+      `Generate a complete optimized eBay listing:
+Product: ${product}
+Condition: ${cond}
+${price?`Price: $${price}`:''}
+${cat?`Category: ${cat}`:''}
+${features?`Features: ${features}`:''}
+
+Return JSON:
+{
+  "title": "Max 80 chars. Keyword-rich. Natural language. No ALL CAPS spam. Brand + model + key spec + condition + type.",
+  "description": "Plain text only (no HTML). Sections: OVERVIEW (2-3 sentences), KEY FEATURES (8-10 bullet points starting with •), WHAT'S IN THE BOX, CONDITION DETAILS, SHIPPING & PAYMENT, WHY BUY FROM US. 400-550 words total. Professional and trust-building.",
+  "keywords": ["8 to 10 strong search keywords buyers actually type"]
+}`,
+      2500
+    );
+    const d = parseJSON(raw);
+    document.getElementById('ebay-title-text').textContent = d.title||'';
+    document.getElementById('ebay-char-count').textContent = (d.title||'').length + '/80 chars';
+    document.getElementById('ebay-desc-text').textContent = d.description||'';
+    const tags = document.getElementById('ebay-tags');
+    tags.innerHTML = '';
+    (d.keywords||[]).forEach(k => {
+      tags.innerHTML += `<span class="tag tag-teal">${k}</span>`;
+    });
+    showResult('ebay-result');
+  } catch(e) { showErr('ebay-error', e.message); }
+  finally { setBtn('ebay-btn', false, '✨ Generate Listing'); }
+}
+
+// ═══════════════════════════════════════════════
+//  AGENT 3 — FACEBOOK PRICING
+// ═══════════════════════════════════════════════
+async function fbPricing() {
+  const product  = document.getElementById('fb-product').value.trim();
+  const cond     = document.getElementById('fb-condition').value;
+  const cost     = parseFloat(document.getElementById('fb-cost').value)||0;
+  const location = document.getElementById('fb-location').value.trim();
+  const context  = document.getElementById('fb-context').value.trim();
+  if (!product) { alert('Enter the product name first.'); return; }
+
+  hideErr('fb-error');
+  hideResult('fb-result');
+  setBtn('fb-btn', true, '📍 Get Pricing Advice');
+
+  try {
+    const raw = await callClaude(
+      `You are an expert Facebook Marketplace reseller who understands local buyer psychology, regional pricing, and negotiation strategy. Only respond with valid JSON.`,
+      `Give complete FB Marketplace pricing advice for:
+Product: ${product}
+Condition: ${cond}
+${cost?`My cost: $${cost}`:''}
+${location?`Location: ${location}`:''}
+${context?`Context: ${context}`:''}
+
+Return JSON:
+{
+  "low_price": 35,
+  "recommended_price": 45,
+  "high_price": 55,
+  "list_at": 49,
+  "accept_min": 38,
+  "profit_at_recommended": 27,
+  "roi_at_recommended": 150,
+  "reasoning": "2-3 sentences explaining your pricing logic and local market insight",
+  "tips": [
+    {"icon": "📸", "tip": "Photo/listing tip"},
+    {"icon": "⏰", "tip": "Best time to post"},
+    {"icon": "💬", "tip": "How to handle lowball offers"},
+    {"icon": "🏷️", "tip": "Pricing psychology tip"},
+    {"icon": "📍", "tip": "Location / meetup tip"},
+    {"icon": "🔄", "tip": "If it doesn't sell tip"}
+  ]
+}`,
+      1800
+    );
+    renderFBPricing(parseJSON(raw));
+  } catch(e) { showErr('fb-error', e.message); }
+  finally { setBtn('fb-btn', false, '📍 Get Pricing Advice'); }
+}
+
+function renderFBPricing(d) {
+  document.getElementById('fb-trio').innerHTML = `
+    <div class="trio-cell">
+      <div class="trio-lbl">Low / Quick Sale</div>
+      <div class="trio-val c-red">$${d.low_price||'—'}</div>
+      <div class="trio-sub">Move it fast</div>
+    </div>
+    <div class="trio-cell rec">
+      <div class="trio-lbl">Recommended</div>
+      <div class="trio-val c-accent">$${d.recommended_price||'—'}</div>
+      <div class="trio-sub">Best balance</div>
+      <div><span class="trio-badge">★ Sweet Spot</span></div>
+    </div>
+    <div class="trio-cell">
+      <div class="trio-lbl">High / Patient</div>
+      <div class="trio-val c-green">$${d.high_price||'—'}</div>
+      <div class="trio-sub">Max profit</div>
+    </div>`;
+
+  document.getElementById('fb-sub-row').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;padding:14px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border)">
+      <div style="text-align:center">
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">List At</div>
+        <div style="font-size:20px;font-weight:700;color:var(--yellow)">$${d.list_at||d.recommended_price||'—'}</div>
+        <div style="font-size:11px;color:var(--muted)">Your asking price</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Walk-Away Min</div>
+        <div style="font-size:20px;font-weight:700;color:var(--red)">$${d.accept_min||'—'}</div>
+        <div style="font-size:11px;color:var(--muted)">Don't go below</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Est. Profit</div>
+        <div style="font-size:20px;font-weight:700;color:var(--green)">$${d.profit_at_recommended||'—'}</div>
+        <div style="font-size:11px;color:var(--muted)">${d.roi_at_recommended||'—'}% ROI</div>
+      </div>
+    </div>
+    ${d.reasoning?`<div style="font-size:13px;color:var(--muted);padding:11px 14px;background:rgba(108,99,255,0.06);border-radius:var(--r-sm);border-left:3px solid var(--accent);line-height:1.6">${d.reasoning}</div>`:''}`;
+
+  document.getElementById('fb-tips').innerHTML = (d.tips||[]).map(t =>
+    `<li><span class="tip-ico">${t.icon||'💡'}</span><span>${t.tip}</span></li>`
+  ).join('');
+  showResult('fb-result');
+}
+
+// ═══════════════════════════════════════════════
+//  AGENT 4 — PROFIT CALCULATOR (client-side math)
+// ═══════════════════════════════════════════════
+const FEE_PRESETS = {
+  ebay:    { pct: 13.25, fixed: 0.30, hint: '(eBay standard)' },
+  fb:      { pct: 0,     fixed: 0,    hint: '(free listings)' },
+  amazon:  { pct: 15,    fixed: 0.99, hint: '(FBA referral)' },
+  mercari: { pct: 10,    fixed: 0,    hint: '(Mercari)' },
+};
+
+function applyPreset(key) {
+  const p = FEE_PRESETS[key];
+  document.getElementById('pc-platform').value = key === 'mercari' ? 'mercari' : key;
+  document.getElementById('pc-fee-pct').value   = p.pct;
+  document.getElementById('pc-fee-fixed').value = p.fixed;
+  document.getElementById('pc-fee-hint').textContent = p.hint;
+  calcProfit();
+}
+
+function onPlatformChange() {
+  const v = document.getElementById('pc-platform').value;
+  const p = FEE_PRESETS[v];
+  if (p) {
+    document.getElementById('pc-fee-pct').value   = p.pct;
+    document.getElementById('pc-fee-fixed').value = p.fixed;
+    document.getElementById('pc-fee-hint').textContent = p.hint;
+  }
+  calcProfit();
+}
+
+function calcProfit() {
+  const buy      = parseFloat(document.getElementById('pc-buy').value)      || 0;
+  const sell     = parseFloat(document.getElementById('pc-sell').value)     || 0;
+  const feePct   = parseFloat(document.getElementById('pc-fee-pct').value)  || 0;
+  const feeFixed = parseFloat(document.getElementById('pc-fee-fixed').value)|| 0;
+  const payPct   = parseFloat(document.getElementById('pc-payment').value)  || 0;
+  const shipOut  = parseFloat(document.getElementById('pc-ship-out').value) || 0;
+  const shipIn   = parseFloat(document.getElementById('pc-ship-in').value)  || 0;
+  const other    = parseFloat(document.getElementById('pc-other').value)    || 0;
+
+  const platformFee  = sell * (feePct / 100) + feeFixed;
+  const payFee       = sell * (payPct / 100);
+  const shipNet      = shipOut - shipIn;
+  const totalFees    = platformFee + payFee + shipNet + other;
+  const netProfit    = sell - buy - totalFees;
+  const roi          = buy > 0 ? (netProfit / buy) * 100 : 0;
+  const margin       = sell > 0 ? (netProfit / sell) * 100 : 0;
+
+  const pHero = document.getElementById('ph-val');
+  pHero.textContent = fmt(netProfit);
+  pHero.style.color = netProfit > 0 ? 'var(--green)' : netProfit < 0 ? 'var(--red)' : 'var(--text)';
+  document.getElementById('ph-sub').textContent =
+    sell > 0 ? `${pct(margin)} profit margin · ${pct(roi)} ROI` : 'Enter your numbers above to calculate';
+
+  document.getElementById('pm-gross').textContent  = fmt(sell);
+  document.getElementById('pm-fees').textContent   = fmt(totalFees);
+  document.getElementById('pm-fees').style.color   = totalFees > 0 ? 'var(--red)' : 'var(--muted)';
+  document.getElementById('pm-roi').textContent    = pct(roi);
+  document.getElementById('pm-roi').style.color    = roi > 50 ? 'var(--green)' : roi > 0 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('pm-margin').textContent = pct(margin);
+  document.getElementById('pm-margin').style.color = margin > 20 ? 'var(--green)' : margin > 0 ? 'var(--yellow)' : 'var(--red)';
+
+  const rows = [
+    ['Sell Price',            sell,         '', 'c-blue'],
+    ['Buy / Cost Price',      -buy,         '', 'c-red'],
+    ['Platform Fee ('+feePct+'% + '+fmt(feeFixed)+')', -platformFee, '', 'c-red'],
+    payPct > 0 ? ['Payment Processing ('+payPct+'%)', -payFee, '', 'c-red'] : null,
+    shipOut > 0 ? ['Shipping Paid Out',   -shipOut, '', 'c-red'] : null,
+    shipIn  > 0 ? ['Shipping Collected',   shipIn,  '', 'c-green'] : null,
+    other   > 0 ? ['Other Costs',         -other,   '', 'c-red'] : null,
+    ['───────────────── NET PROFIT', netProfit, '', netProfit>=0?'c-green':'c-red'],
+  ].filter(Boolean);
+
+  document.getElementById('pc-breakdown').innerHTML = rows.map(([lbl,val,,cls]) =>
+    `<div class="pr"><span class="pr-lbl">${lbl}</span><span class="pr-val ${cls||''}">${val<0?'-'+fmt(Math.abs(val)):fmt(val)}</span></div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  AGENT 5 — PRODUCT RESEARCH
+// ═══════════════════════════════════════════════
+async function researchProduct() {
+  const product  = document.getElementById('res-product').value.trim();
+  const cost     = document.getElementById('res-cost').value;
+  const platform = document.getElementById('res-platform').value;
+  const level    = document.getElementById('res-level').value;
+  if (!product) { alert('Describe the product first.'); return; }
+
+  hideErr('res-error');
+  hideResult('res-result');
+  setBtn('res-btn', true, '🔬 Analyze Product');
+
+  try {
+    const raw = await callClaude(
+      `You are an expert reselling coach who evaluates products for flip potential based on real market data. Only respond with valid JSON.`,
+      `Analyze this product for reselling potential:
+${product}
+${cost?`Buy price: $${cost}`:''}
+Target platform: ${platform}
+Seller experience: ${level}
+
+Return JSON:
+{
+  "verdict": "Worth It" | "Maybe" | "Skip",
+  "verdict_reason": "One punchy sentence summarizing your verdict",
+  "flip_score": 7,
+  "demand_score": 80,
+  "competition_score": 55,
+  "profit_potential_score": 70,
+  "saturation_score": 40,
+  "best_platform": "eBay",
+  "est_sell_price_low": 45,
+  "est_sell_price_high": 65,
+  "est_profit_low": 15,
+  "est_profit_high": 30,
+  "avg_time_to_sell": "3–7 days on eBay, 1–2 weeks on FB",
+  "pros": [
+    {"icon": "✅", "text": "Opportunity or positive factor"},
+    {"icon": "✅", "text": "Another strength"},
+    {"icon": "✅", "text": "Another strength"}
+  ],
+  "cons": [
+    {"icon": "⚠️", "text": "Risk or challenge"},
+    {"icon": "⚠️", "text": "Another risk"}
+  ],
+  "advice": "3-4 sentence strategic recommendation tailored to their experience level."
+}`,
+      2000
+    );
+    renderResearch(parseJSON(raw));
+  } catch(e) { showErr('res-error', e.message); }
+  finally { setBtn('res-btn', false, '🔬 Analyze Product'); }
+}
+
+function renderResearch(d) {
+  const vc = document.getElementById('res-verdict-card');
+  vc.className = 'verdict-card';
+  const v = (d.verdict||'').toLowerCase();
+  if (v.includes('worth') || v==='yes') {
+    vc.classList.add('verdict-worth');
+    document.getElementById('res-verdict-emoji').textContent = '✅';
+    document.getElementById('res-verdict-label').textContent = 'Worth Flipping';
+    document.getElementById('res-verdict-label').style.color = 'var(--green)';
+  } else if (v.includes('maybe') || v.includes('maybe')) {
+    vc.classList.add('verdict-maybe');
+    document.getElementById('res-verdict-emoji').textContent = '🤔';
+    document.getElementById('res-verdict-label').textContent = 'Proceed with Caution';
+    document.getElementById('res-verdict-label').style.color = 'var(--yellow)';
+  } else {
+    vc.classList.add('verdict-skip');
+    document.getElementById('res-verdict-emoji').textContent = '🚫';
+    document.getElementById('res-verdict-label').textContent = 'Skip This One';
+    document.getElementById('res-verdict-label').style.color = 'var(--red)';
+  }
+  document.getElementById('res-verdict-sub').textContent = d.verdict_reason || '';
+
+  const meters = [
+    { label: 'Demand',           val: d.demand_score||0,           color: 'var(--green)' },
+    { label: 'Profit Potential', val: d.profit_potential_score||0, color: 'var(--accent)' },
+    { label: 'Competition',      val: d.competition_score||0,      color: 'var(--red)' },
+    { label: 'Market Saturation',val: d.saturation_score||0,       color: 'var(--yellow)' },
+  ];
+  document.getElementById('res-meters').innerHTML = meters.map(m => `
+    <div class="meter-row">
+      <div class="meter-name">${m.label}</div>
+      <div class="meter-bar-wrap">
+        <div class="meter-bar" style="width:${m.val}%;background:${m.color}"></div>
+      </div>
+      <div class="meter-val" style="color:${m.color}">${m.val}</div>
+    </div>`).join('');
+
+  document.getElementById('res-best-platform').textContent = d.best_platform||'—';
+  document.getElementById('res-sell-price').textContent = d.est_sell_price_low&&d.est_sell_price_high
+    ? `$${d.est_sell_price_low} – $${d.est_sell_price_high}` : '—';
+  document.getElementById('res-profit').textContent = d.est_profit_low&&d.est_profit_high
+    ? `$${d.est_profit_low} – $${d.est_profit_high}/unit` : '—';
+  document.getElementById('res-time').textContent = d.avg_time_to_sell||'—';
+
+  document.getElementById('res-pros').innerHTML = (d.pros||[]).map(p =>
+    `<li><span class="tip-ico">${p.icon}</span><span>${p.text}</span></li>`).join('');
+  document.getElementById('res-cons').innerHTML = (d.cons||[]).map(c =>
+    `<li><span class="tip-ico">${c.icon}</span><span>${c.text}</span></li>`).join('');
+  document.getElementById('res-advice').textContent = d.advice||'';
+
+  showResult('res-result');
+}
+
+// ═══════════════════════════════════════════════
+//  AGENT 6 — SHIPPING ESTIMATOR
+// ═══════════════════════════════════════════════
+function updateDimWeight() {
+  const lbs = parseFloat(document.getElementById('sh-lbs').value)||0;
+  const oz  = parseFloat(document.getElementById('sh-oz').value)||0;
+  const total = lbs + oz/16;
+  document.getElementById('sh-weight-display').value = total.toFixed(2)+' lbs';
+
+  const l = parseFloat(document.getElementById('sh-l').value)||0;
+  const w = parseFloat(document.getElementById('sh-w').value)||0;
+  const h = parseFloat(document.getElementById('sh-h').value)||0;
+  const dimW = (l * w * h) / 139;
+  document.getElementById('sh-dim-weight').value = dimW > 0 ? dimW.toFixed(2)+' lbs' : '—';
+}
+
+async function estimateShipping() {
+  const lbs   = parseFloat(document.getElementById('sh-lbs').value)||0;
+  const oz    = parseFloat(document.getElementById('sh-oz').value)||0;
+  const l     = parseFloat(document.getElementById('sh-l').value)||10;
+  const w     = parseFloat(document.getElementById('sh-w').value)||8;
+  const h     = parseFloat(document.getElementById('sh-h').value)||4;
+  const type  = document.getElementById('sh-type').value;
+  const zone  = document.getElementById('sh-zone').value;
+  const value = document.getElementById('sh-value').value;
+  const totalLbs = lbs + oz/16;
+
+  hideErr('sh-error');
+  hideResult('sh-result');
+  setBtn('sh-btn', true, '📦 Estimate Shipping');
+
+  try {
+    const raw = await callClaude(
+      `You are a shipping expert who knows USPS, UPS, and FedEx retail and eBay-discounted rates. Only respond with valid JSON.`,
+      `Estimate shipping costs for this package:
+Weight: ${totalLbs.toFixed(2)} lbs (${lbs}lb ${oz}oz)
+Dimensions: ${l}" × ${w}" × ${h}" (L×W×H)
+Package type: ${type}
+Shipping zone/distance: ${zone}
+${value?`Declared value: $${value}`:''}
+
+Dimensional weight (÷139): ${((l*w*h)/139).toFixed(2)} lbs
+Billable weight: ${Math.max(totalLbs, (l*w*h)/139).toFixed(2)} lbs
+
+Return JSON:
+{
+  "carriers": [
+    {
+      "carrier": "USPS First Class",
+      "retail_cost": 4.50,
+      "ebay_cost": 3.20,
+      "days": "2–5 days",
+      "best_for": "Items under 16oz",
+      "available": true
+    },
+    {
+      "carrier": "USPS Ground Advantage",
+      "retail_cost": 8.20,
+      "ebay_cost": 5.80,
+      "days": "2–5 days",
+      "best_for": "Up to 70 lbs, best value",
+      "available": true
+    },
+    {
+      "carrier": "USPS Priority Mail",
+      "retail_cost": 12.40,
+      "ebay_cost": 9.10,
+      "days": "1–3 days",
+      "best_for": "Fast delivery, flat rate option",
+      "available": true
+    },
+    {
+      "carrier": "UPS Ground",
+      "retail_cost": 15.60,
+      "ebay_cost": 10.80,
+      "days": "1–5 days",
+      "best_for": "Heavier packages",
+      "available": true
+    },
+    {
+      "carrier": "FedEx Ground",
+      "retail_cost": 14.90,
+      "ebay_cost": 10.20,
+      "days": "1–5 days",
+      "best_for": "Reliable tracking",
+      "available": true
+    }
+  ],
+  "cheapest_carrier": "USPS First Class",
+  "recommended_carrier": "USPS Ground Advantage",
+  "advice": "2-3 sentences with the best shipping strategy for this specific package and zone.",
+  "local_pickup_savings": "Estimated savings over cheapest shipping option if sold locally via FB Marketplace.",
+  "local_notes": "2 sentences about when local pickup makes most sense for this package."
+}`,
+      2000
+    );
+    renderShipping(parseJSON(raw));
+  } catch(e) { showErr('sh-error', e.message); }
+  finally { setBtn('sh-btn', false, '📦 Estimate Shipping'); }
+}
+
+function renderShipping(d) {
+  const tbody = document.getElementById('sh-tbody');
+  tbody.innerHTML = '';
+  (d.carriers||[]).filter(c=>c.available!==false).forEach(c => {
+    const isCheapest = c.carrier === d.cheapest_carrier;
+    const isRec      = c.carrier === d.recommended_carrier;
+    tbody.innerHTML += `
+      <tr class="${isCheapest?'cheapest-row':''}">
+        <td>
+          <div class="carrier-name">
+            ${c.carrier}
+            ${isCheapest?'<span class="carrier-tag cheapest-tag">Cheapest</span>':''}
+            ${isRec&&!isCheapest?'<span class="carrier-tag rec-tag">Recommended</span>':''}
+          </div>
+        </td>
+        <td>
+          <div style="font-weight:700;color:var(--green)">${fmt(c.ebay_cost)}<span style="font-size:10px;color:var(--muted);font-weight:400"> (eBay rate)</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Retail: ${fmt(c.retail_cost)}</div>
+        </td>
+        <td><div class="ship-days">${c.days||'—'}</div></td>
+        <td style="font-size:12px;color:var(--muted);max-width:180px">${c.best_for||'—'}</td>
+      </tr>`;
+  });
+
+  document.getElementById('sh-advice').innerHTML =
+    d.advice ? `<div style="padding:12px 15px;background:rgba(108,99,255,0.06);border-left:3px solid var(--accent);border-radius:var(--r-sm);line-height:1.6">${d.advice}</div>` : '';
+
+  document.getElementById('sh-local').innerHTML = `
+    <div class="pr"><span class="pr-lbl">💰 Shipping Savings (FB Marketplace local pickup)</span><span class="pr-val c-green">${d.local_pickup_savings||'Varies'}</span></div>
+    <div style="margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6">${d.local_notes||''}</div>`;
+
+  showResult('sh-result');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+syncKeyStatus();
+updateDimWeight();
+calcProfit();
+</script>
+</body>
+</html>
