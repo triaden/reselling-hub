@@ -692,86 +692,141 @@ select option { background: var(--surface2); }
 .ship-days { font-size: 11px; color: var(--muted); }
 
 /* ══════════════════════════════════════════════
-   AGENT 7 — SUPPLIER FINDER
+   AGENT 7 — SUPPLIER FINDER (v2)
 ══════════════════════════════════════════════ */
 .supplier-card {
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 20px;
-  margin-bottom: 14px;
+  padding: 0;
+  margin-bottom: 16px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s, transform 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.supplier-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.supplier-card::before {
-  content: '';
-  position: absolute; top:0; left:0; bottom:0; width:4px;
-  background: linear-gradient(180deg, var(--accent), var(--teal));
+.supplier-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 24px rgba(108,99,255,0.1);
 }
-.supplier-header {
+.supplier-card-top {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-left: 12px;
-  margin-bottom: 14px;
+  align-items: stretch;
+  gap: 0;
 }
-.supplier-name { font-size: 16px; font-weight: 700; line-height: 1.3; }
-.supplier-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.supplier-rank-bar {
+  width: 52px;
+  background: linear-gradient(180deg, rgba(108,99,255,0.18) 0%, rgba(78,205,196,0.1) 100%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.rank-num {
+  font-size: 20px; font-weight: 800; color: var(--accent); line-height: 1;
+}
+.rank-stars { font-size: 9px; color: var(--yellow); letter-spacing: 1px; }
+.supplier-body { flex: 1; padding: 18px; min-width: 0; }
+.supplier-name { font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+.supplier-location { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.supplier-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .ta-badge {
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 700; padding: 3px 8px;
+  font-size: 11px; font-weight: 700; padding: 3px 9px;
   border-radius: 100px;
 }
 .ta-yes { background: rgba(76,175,125,0.15); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
 .ta-no  { background: rgba(255,107,107,0.12); color: var(--red);   border: 1px solid rgba(255,107,107,0.25); }
-.supplier-rank {
-  font-size: 22px; font-weight: 800; color: var(--accent);
-  opacity: 0.35; flex-shrink: 0; line-height: 1;
-}
 .supplier-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-left: 12px;
-  margin-bottom: 14px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
 }
 .ss-box {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  padding: 10px;
+  padding: 9px 6px;
   text-align: center;
 }
-.ss-lbl { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-.ss-val { font-size: 14px; font-weight: 700; }
-.star-row { color: var(--yellow); font-size: 13px; letter-spacing: 1px; }
+.ss-lbl { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+.ss-val { font-size: 13px; font-weight: 700; line-height: 1.2; }
+.supplier-price-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.sp-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+.sp-lbl { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.sp-val { font-size: 14px; font-weight: 700; }
+.search-terms-box {
+  background: rgba(78,205,196,0.05);
+  border: 1px solid rgba(78,205,196,0.2);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.search-terms-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--teal); margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.search-term-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r-xs); padding: 5px 10px;
+  font-size: 12px; font-weight: 500; color: var(--text);
+  margin: 3px 4px 3px 0; cursor: pointer; transition: all 0.15s;
+  user-select: none;
+}
+.search-term-pill:hover { border-color: var(--teal); color: var(--teal); }
+.search-term-pill .pill-copy { font-size: 10px; color: var(--muted2); }
+.why-rec {
+  background: rgba(108,99,255,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  font-size: 12px; color: var(--muted); line-height: 1.55;
+  margin-bottom: 12px;
+}
+.why-rec strong { color: var(--text); }
+.msg-section { border-top: 1px solid var(--border); padding: 14px 18px; }
+.msg-section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--accent);
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
 .msg-block {
-  margin-left: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   padding: 13px 15px;
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--muted);
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 160px;
-  overflow-y: auto;
+  font-size: 12px; line-height: 1.75; color: var(--muted);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 200px; overflow-y: auto;
 }
-.msg-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 12px;
-  margin-top: 8px;
+.search-all-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 16px;
 }
-.msg-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.8px; color: var(--accent);
+.search-all-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--teal); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
 }
 
 /* ══════════════════════════════════════════════
@@ -1461,38 +1516,42 @@ select option { background: var(--surface2); }
         <div class="banner banner-error result" id="sh-error"></div>
       </div>
 
-      <!-- ══════ PAGE: SUPPLIER FINDER ══════ -->
+      <!-- ══════ PAGE: SUPPLIER FINDER v2 ══════ -->
       <div class="page" id="page-supplier">
         <div class="page-header">
           <div class="page-title">
             <div class="page-title-icon" style="background:rgba(78,205,196,0.15)">🏭</div>
             Supplier Finder
           </div>
-          <div class="page-sub">Paste a product link, describe what you need — get 5 vetted Alibaba suppliers with ready-to-send message templates</div>
-        </div>
-
-        <div class="banner banner-info">
-          🔗 <span><strong>How it works:</strong> Paste the product URL (eBay, Amazon, brand site, etc.) and describe what you want to source. Claude analyzes the product specs and returns matching Alibaba suppliers with contact templates you can copy and send directly.</span>
+          <div class="page-sub">Paste a product link or describe what you need — get 5 Alibaba suppliers with search terms and ready-to-send messages</div>
         </div>
 
         <div class="card">
-          <div class="card-head"><div class="card-head-dot" style="background:var(--teal)"></div> Product to Source</div>
-          <div class="fg" style="margin-bottom:14px">
-            <label>Product URL (eBay listing, Amazon page, brand website, etc.)</label>
-            <input id="sup-url" type="url" placeholder="https://www.ebay.com/itm/… or https://www.amazon.com/dp/…">
+          <div class="card-head"><div class="card-head-dot" style="background:var(--teal)"></div> What do you want to source?</div>
+
+          <div class="fg" style="margin-bottom:12px">
+            <label>Product URL — optional (eBay, Amazon, Carhartt.com, any site)</label>
+            <input id="sup-url" type="text" placeholder="https://www.ebay.com/itm/… or https://carhartt.com/… or leave blank">
           </div>
+
           <div class="fg" style="margin-bottom:14px">
-            <label>What you want to find on Alibaba (be specific)</label>
-            <textarea id="sup-desc" rows="3" placeholder="e.g. I want to find the supplier for this Carhartt-style duck canvas work jacket. Looking for heavyweight 12oz+ canvas, YKK zippers, multiple pockets, MOQ under 100 units, sample under $30. Want Trade Assurance suppliers with 4+ star rating…"></textarea>
+            <label>Describe the product you want to find on Alibaba <span style="color:var(--accent)">*</span></label>
+            <textarea id="sup-desc" rows="4" placeholder="Describe what you're looking for. The more detail the better — material, specs, size, use case, style, etc.
+
+Examples:
+• Heavyweight duck canvas work jacket, Carhartt-style, 12oz+ fabric, YKK zippers, multiple pockets
+• Wireless earbuds with ANC, 30hr battery, USB-C, similar to Sony WF-1000XM5
+• Stainless steel insulated tumbler 40oz, handle + straw lid, similar to Stanley Quencher"></textarea>
           </div>
-          <div class="grid-3" style="margin-bottom:16px">
+
+          <div class="grid-4" style="margin-bottom:16px">
             <div class="fg">
               <label>Max MOQ (units)</label>
-              <input id="sup-moq" type="number" placeholder="e.g. 100" value="100">
+              <input id="sup-moq" type="number" placeholder="100" value="100">
             </div>
             <div class="fg">
               <label>Max Sample Price ($)</label>
-              <input id="sup-sample" type="number" placeholder="e.g. 30" value="30">
+              <input id="sup-sample" type="number" placeholder="30" value="30">
             </div>
             <div class="fg">
               <label>Trade Assurance</label>
@@ -1502,23 +1561,50 @@ select option { background: var(--surface2); }
                 <option value="any">Any</option>
               </select>
             </div>
+            <div class="fg">
+              <label>Supplier Type</label>
+              <select id="sup-type">
+                <option value="factory">Factory / Manufacturer</option>
+                <option value="trading">Trading Company</option>
+                <option value="any" selected>Any</option>
+              </select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="findSuppliers()" id="sup-btn">🏭 Find Suppliers</button>
+
+          <button class="btn btn-primary" onclick="findSuppliers()" id="sup-btn" style="width:100%;justify-content:center;padding:12px">
+            🏭 Find Alibaba Suppliers
+          </button>
         </div>
 
         <div class="result" id="sup-result">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-            <div style="font-size:13px;font-weight:600;color:var(--muted)">
-              <span id="sup-result-label"></span>
-            </div>
-            <div class="tags" id="sup-product-tags"></div>
+
+          <!-- Product analysis summary -->
+          <div class="card" style="background:rgba(78,205,196,0.04);border-color:rgba(78,205,196,0.2)">
+            <div class="card-head" style="margin-bottom:8px"><div class="card-head-dot" style="background:var(--teal)"></div> Product Analysis</div>
+            <div id="sup-summary" style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px"></div>
+            <div class="tags" id="sup-specs"></div>
           </div>
+
+          <!-- All search terms in one place -->
+          <div class="search-all-box">
+            <div class="search-all-title">
+              🔍 Alibaba Search Terms
+              <button class="btn btn-ghost btn-sm" onclick="copyAllTerms()">📋 Copy All</button>
+            </div>
+            <div id="sup-all-terms"></div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:8px">Click any term to copy it instantly. Paste directly into Alibaba's search bar.</div>
+          </div>
+
+          <!-- Supplier cards -->
           <div id="sup-grid"></div>
-          <div class="card" style="margin-top:4px">
-            <div class="card-head"><div class="card-head-dot" style="background:var(--yellow)"></div> Sourcing Tips for This Product</div>
+
+          <!-- Sourcing tips -->
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--yellow)"></div> Sourcing Strategy for This Product</div>
             <ul class="tips" id="sup-tips"></ul>
           </div>
         </div>
+
         <div class="banner banner-error result" id="sup-error"></div>
       </div>
 
@@ -2246,103 +2332,128 @@ function renderShipping(d) {
 }
 
 // ═══════════════════════════════════════════════
-//  AGENT 7 — SUPPLIER FINDER
+//  AGENT 7 — SUPPLIER FINDER v2
 // ═══════════════════════════════════════════════
-async function findSuppliers() {
-  const url     = document.getElementById('sup-url').value.trim();
-  const desc    = document.getElementById('sup-desc').value.trim();
-  const moq     = document.getElementById('sup-moq').value || '100';
-  const sample  = document.getElementById('sup-sample').value || '30';
-  const ta      = document.getElementById('sup-ta').value;
+let _allSearchTerms = [];
 
-  if (!desc) { alert('Please describe what you want to source on Alibaba.'); return; }
+async function findSuppliers() {
+  const url    = document.getElementById('sup-url').value.trim();
+  const desc   = document.getElementById('sup-desc').value.trim();
+  const moq    = document.getElementById('sup-moq').value    || '100';
+  const sample = document.getElementById('sup-sample').value || '30';
+  const ta     = document.getElementById('sup-ta').value;
+  const type   = document.getElementById('sup-type').value;
+
+  if (!desc) { alert('Please describe the product you want to source.'); return; }
 
   hideErr('sup-error');
   hideResult('sup-result');
-  setBtn('sup-btn', true, '🏭 Find Suppliers');
+  setBtn('sup-btn', true, '🏭 Find Alibaba Suppliers');
 
   try {
     const raw = await callClaude(
-      `You are an expert Alibaba sourcing agent with years of experience vetting suppliers for resellers. You know supplier quality signals, Trade Assurance, gold supplier status, and how to write effective first-contact messages. Always respond with valid JSON only.`,
-      `Find 5 realistic Alibaba suppliers for this sourcing request.
+      `You are a world-class Alibaba sourcing expert and product analyst. You know exactly how to identify the right Chinese manufacturers for any product, understand Trade Assurance, gold supplier verification, and write high-converting supplier outreach messages. Always respond with valid JSON only — no markdown, no commentary.`,
+      `Analyze this sourcing request and return 5 highly targeted Alibaba supplier recommendations.
 
-Product URL (for context on specs/style): ${url || 'Not provided'}
-What I want to source: ${desc}
-Max MOQ: ${moq} units
-Max sample price: $${sample}
-Trade Assurance: ${ta}
+${url ? `Reference product URL: ${url}` : ''}
+Product description: ${desc}
+Requirements: Max MOQ ${moq} units · Max sample price $${sample} · Trade Assurance: ${ta} · Supplier type: ${type}
 
-Return JSON:
+Return this exact JSON structure:
 {
-  "product_summary": "1-sentence description of what this buyer is sourcing",
-  "key_specs": ["spec1", "spec2", "spec3", "spec4"],
+  "product_summary": "Precise 1-sentence description of what is being sourced, naming key material/specs",
+  "key_specs": ["4-6 specific product specs derived from the description"],
+  "alibaba_search_terms": [
+    "most specific search term (e.g. '12oz duck canvas work jacket YKK zipper')",
+    "medium specificity term (e.g. 'heavyweight canvas jacket manufacturer')",
+    "broad category term (e.g. 'workwear jacket factory')",
+    "alternative keyword term",
+    "Chinese manufacturing term or product code if applicable"
+  ],
   "suppliers": [
     {
       "rank": 1,
-      "company_name": "Realistic Chinese factory/trading company name",
+      "company_name": "Realistic Dongguan/Guangzhou/Yiwu factory name e.g. 'Guangdong Tianlong Garment Co., Ltd.'",
+      "supplier_type": "Manufacturer" or "Trading Company",
       "location": "City, Province, China",
       "trade_assurance": true,
       "gold_supplier": true,
-      "years_on_platform": 8,
-      "rating": 4.8,
-      "review_count": 312,
-      "response_rate": "97%",
+      "years_on_platform": 9,
+      "rating": 4.9,
+      "review_count": 487,
+      "response_rate": "98%",
+      "response_time": "within 2 hours",
       "moq": 50,
-      "unit_price_range": "$8.50 – $12.00",
-      "sample_price": "$18.00",
-      "sample_time": "3–5 days",
-      "production_lead_time": "15–20 days",
-      "main_products": "Brief description of what they manufacture",
-      "certifications": ["CE", "ISO 9001"],
-      "why_recommended": "One sentence on why this supplier stands out",
-      "message_template": "Dear [Supplier Name],\\n\\nI found your store on Alibaba and I'm interested in sourcing [PRODUCT]. I'm a reseller based in the US and I'm looking to place an initial order of [QTY] units.\\n\\nI have a few questions:\\n1. What is your best price for [QTY] units?\\n2. Can you send me a sample first? What is the sample cost and shipping time to the USA?\\n3. Do you offer customization (logo/label)?\\n4. What is your production lead time for [QTY] units?\\n5. Do you accept Trade Assurance orders?\\n\\nI'm ready to move forward quickly if the sample meets my standards. Looking forward to hearing from you.\\n\\nBest regards,\\n[Your Name]"
+      "unit_price_range": "$8.50 – $14.00",
+      "sample_price": "$22.00",
+      "sample_time": "3–5 business days",
+      "production_lead_time": "18–25 days",
+      "customization": "OEM/ODM available, logo embroidery, custom labels",
+      "certifications": ["ISO 9001", "OEKO-TEX"],
+      "main_products": "Brief specific description of their product range",
+      "why_recommended": "Specific reason this supplier is a strong match for this exact product",
+      "alibaba_search_hint": "The most specific search term to find THIS supplier on Alibaba",
+      "message_template": "Dear [Supplier Name] Team,\\n\\nI came across your company on Alibaba and I'm very interested in your [SPECIFIC PRODUCT] manufacturing capabilities.\\n\\nI'm a US-based reseller and I'm currently evaluating suppliers for [PRODUCT DESCRIPTION]. After reviewing your profile, I believe your factory could be a great long-term partner.\\n\\nI have a few questions before placing an order:\\n\\n1. PRICING: What is your best price per unit for an order of [QTY] pcs? And [QTY x2] pcs?\\n2. SAMPLE: Can I order 1–2 samples to evaluate quality? What is the sample cost including DHL shipping to USA?\\n3. LEAD TIME: What is the production lead time for [QTY] units?\\n4. CUSTOMIZATION: Do you offer private label / custom logo? What is the setup fee?\\n5. QUALITY: What quality control process do you use? Do you have ISO or other certifications?\\n6. PAYMENT: Do you accept Trade Assurance? What payment terms do you offer?\\n\\nI'm ready to move quickly if the sample quality meets my standards. I'm also open to a long-term relationship with consistent monthly orders.\\n\\nLooking forward to your reply.\\n\\nBest regards,\\n[Your Name]\\n[Your Company]"
     }
   ],
   "sourcing_tips": [
-    {"icon": "✅", "tip": "Specific vetting tip for this product category"},
-    {"icon": "⚠️", "tip": "Common scam or quality issue to watch for"},
-    {"icon": "💬", "tip": "Negotiation tip for this type of supplier"},
-    {"icon": "📦", "tip": "Shipping or logistics tip"},
-    {"icon": "🔍", "tip": "How to verify supplier legitimacy"}
+    {"icon": "🔍", "tip": "Specific search or filtering tip for finding this type of supplier on Alibaba"},
+    {"icon": "🛡️", "tip": "Vetting tip specific to this product category — what to look for or ask"},
+    {"icon": "⚠️", "tip": "The most common scam, quality issue, or red flag for this product type"},
+    {"icon": "💬", "tip": "Negotiation tactic that works well for this product and order size"},
+    {"icon": "📦", "tip": "Shipping method recommendation for samples and bulk orders of this product"},
+    {"icon": "✅", "tip": "One quality-control step to take before accepting the bulk order"}
   ]
 }
 
-Make supplier names and details realistic and specific. Vary the stats. Tailor the message template to the specific product being sourced.`,
-      3000
+Make company names sound authentic (include Co., Ltd. or similar). Vary stats realistically across suppliers. The message template must reference the actual product being sourced, not generic placeholders.`,
+      3500
     );
 
     renderSuppliers(parseJSON(raw));
   } catch(e) {
     showErr('sup-error', e.message);
   } finally {
-    setBtn('sup-btn', false, '🏭 Find Suppliers');
+    setBtn('sup-btn', false, '🏭 Find Alibaba Suppliers');
   }
 }
 
 function renderSuppliers(d) {
-  document.getElementById('sup-result-label').textContent =
-    d.product_summary ? `Sourcing: ${d.product_summary}` : '5 suppliers found';
-
-  const tagsEl = document.getElementById('sup-product-tags');
-  tagsEl.innerHTML = (d.key_specs || []).map(s =>
+  // Summary + specs
+  document.getElementById('sup-summary').textContent = d.product_summary || '';
+  document.getElementById('sup-specs').innerHTML = (d.key_specs || []).map(s =>
     `<span class="tag tag-teal">${s}</span>`).join('');
 
+  // All search terms panel
+  _allSearchTerms = d.alibaba_search_terms || [];
+  document.getElementById('sup-all-terms').innerHTML = _allSearchTerms.map((t, i) =>
+    `<span class="search-term-pill" onclick="copyTerm(this,'${t.replace(/'/g,"\\'")}')">
+      <span>🔍</span><span>${t}</span><span class="pill-copy">click to copy</span>
+    </span>`
+  ).join('');
+
+  // Supplier cards
   const grid = document.getElementById('sup-grid');
   grid.innerHTML = '';
 
   (d.suppliers || []).forEach((s, i) => {
-    const stars = '★'.repeat(Math.round(s.rating || 4)) + '☆'.repeat(5 - Math.round(s.rating || 4));
-    const certs = (s.certifications || []).map(c =>
-      `<span class="tag tag-purple" style="font-size:10px">${c}</span>`).join('');
-    const msgId = `sup-msg-${i}`;
-    const btnId = `sup-copy-${i}`;
+    const stars     = '★'.repeat(Math.min(5, Math.round(s.rating || 4))) + '☆'.repeat(Math.max(0, 5 - Math.round(s.rating || 4)));
+    const certs     = (s.certifications || []).map(c => `<span class="tag tag-purple" style="font-size:10px">${c}</span>`).join('');
+    const msgId     = `sup-msg-${i}`;
+    const msgBtnId  = `sup-mbtn-${i}`;
+    const msgRaw    = (s.message_template || '').replace(/\\n/g, '\n');
 
     grid.innerHTML += `
     <div class="supplier-card">
-      <div class="supplier-header">
-        <div>
-          <div class="supplier-name">${s.company_name || 'Supplier ' + (i+1)}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:3px">📍 ${s.location || 'China'}</div>
+      <div class="supplier-card-top">
+        <div class="supplier-rank-bar">
+          <div class="rank-num">#${s.rank || i+1}</div>
+          <div class="rank-stars">${stars}</div>
+          <div style="font-size:10px;color:var(--yellow);font-weight:700">${(s.rating||0).toFixed(1)}</div>
+        </div>
+        <div class="supplier-body">
+          <div class="supplier-name">${s.company_name || 'Supplier '+(i+1)}</div>
+          <div class="supplier-location">📍 ${s.location || 'China'} · ${s.supplier_type || 'Manufacturer'}</div>
           <div class="supplier-meta">
             <span class="ta-badge ${s.trade_assurance ? 'ta-yes' : 'ta-no'}">
               ${s.trade_assurance ? '🛡️ Trade Assurance' : '⚠️ No Trade Assurance'}
@@ -2350,51 +2461,70 @@ function renderSuppliers(d) {
             ${s.gold_supplier ? '<span class="tag tag-yellow" style="font-size:10px">⭐ Gold Supplier</span>' : ''}
             ${certs}
           </div>
+
+          <div class="supplier-stats">
+            <div class="ss-box">
+              <div class="ss-lbl">Years</div>
+              <div class="ss-val">${s.years_on_platform || '—'}<span style="font-size:9px;color:var(--muted)"> yrs</span></div>
+            </div>
+            <div class="ss-box">
+              <div class="ss-lbl">Reviews</div>
+              <div class="ss-val">${(s.review_count||0) >= 1000 ? ((s.review_count||0)/1000).toFixed(1)+'k' : (s.review_count||0)}</div>
+            </div>
+            <div class="ss-box">
+              <div class="ss-lbl">Response</div>
+              <div class="ss-val c-green" style="font-size:11px">${s.response_rate || '—'}</div>
+            </div>
+            <div class="ss-box">
+              <div class="ss-lbl">MOQ</div>
+              <div class="ss-val c-accent">${s.moq || '—'}<span style="font-size:9px;color:var(--muted)"> pcs</span></div>
+            </div>
+            <div class="ss-box">
+              <div class="ss-lbl">Reply Time</div>
+              <div class="ss-val" style="font-size:10px;color:var(--muted)">${s.response_time || '—'}</div>
+            </div>
+          </div>
+
+          <div class="supplier-price-row">
+            <div class="sp-cell">
+              <div class="sp-lbl">Unit Price</div>
+              <div class="sp-val c-green">${s.unit_price_range || '—'}</div>
+            </div>
+            <div class="sp-cell">
+              <div class="sp-lbl">Sample Price</div>
+              <div class="sp-val c-yellow">${s.sample_price || '—'}</div>
+            </div>
+            <div class="sp-cell">
+              <div class="sp-lbl">Lead Time</div>
+              <div class="sp-val" style="font-size:12px">${s.production_lead_time || '—'}</div>
+            </div>
+          </div>
+
+          ${s.customization ? `<div class="pr" style="margin-bottom:8px"><span class="pr-lbl">🎨 Customization</span><span class="pr-val" style="font-size:12px;color:var(--muted)">${s.customization}</span></div>` : ''}
+
+          ${s.alibaba_search_hint ? `
+          <div class="search-terms-box">
+            <div class="search-terms-label">
+              🔍 Find This Supplier
+            </div>
+            <span class="search-term-pill" onclick="copyTerm(this,'${s.alibaba_search_hint.replace(/'/g,"\\'")}')">
+              <span>🔍</span><span>${s.alibaba_search_hint}</span><span class="pill-copy">click to copy</span>
+            </span>
+          </div>` : ''}
+
+          ${s.why_recommended ? `
+          <div class="why-rec">
+            <strong>Why this supplier:</strong> ${s.why_recommended}
+          </div>` : ''}
         </div>
-        <div class="supplier-rank">#${s.rank || i+1}</div>
       </div>
 
-      <div class="supplier-stats">
-        <div class="ss-box">
-          <div class="ss-lbl">Rating</div>
-          <div class="ss-val c-yellow">${(s.rating || 0).toFixed(1)}</div>
-          <div class="star-row" style="font-size:10px">${stars}</div>
+      <div class="msg-section">
+        <div class="msg-section-label">
+          <span>💬 Ready-to-Send Message Template</span>
+          <button class="btn btn-ghost btn-sm" id="${msgBtnId}" onclick="copySupMsg('${msgId}','${msgBtnId}')">📋 Copy Message</button>
         </div>
-        <div class="ss-box">
-          <div class="ss-lbl">Years</div>
-          <div class="ss-val">${s.years_on_platform || '—'}<span style="font-size:10px;font-weight:400;color:var(--muted)"> yrs</span></div>
-        </div>
-        <div class="ss-box">
-          <div class="ss-lbl">MOQ</div>
-          <div class="ss-val c-accent">${s.moq || '—'}<span style="font-size:10px;font-weight:400;color:var(--muted)"> pcs</span></div>
-        </div>
-        <div class="ss-box">
-          <div class="ss-lbl">Response</div>
-          <div class="ss-val c-green">${s.response_rate || '—'}</div>
-        </div>
-      </div>
-
-      <div style="margin-left:12px;margin-bottom:12px">
-        <div class="pr"><span class="pr-lbl">💰 Unit Price Range</span><span class="pr-val c-green">${s.unit_price_range || '—'}</span></div>
-        <div class="pr"><span class="pr-lbl">🧪 Sample Price</span><span class="pr-val c-yellow">${s.sample_price || '—'}</span></div>
-        <div class="pr"><span class="pr-lbl">⏱ Sample Lead Time</span><span class="pr-val">${s.sample_time || '—'}</span></div>
-        <div class="pr"><span class="pr-lbl">🏭 Production Lead Time</span><span class="pr-val">${s.production_lead_time || '—'}</span></div>
-        <div class="pr"><span class="pr-lbl">🔢 Reviews</span><span class="pr-val">${(s.review_count||0).toLocaleString()} reviews</span></div>
-        ${s.main_products ? `<div class="pr"><span class="pr-lbl">📦 Main Products</span><span class="pr-val" style="font-size:12px;color:var(--muted);text-align:right;max-width:60%">${s.main_products}</span></div>` : ''}
-      </div>
-
-      ${s.why_recommended ? `
-      <div style="margin:0 0 12px 12px;padding:10px 12px;background:rgba(108,99,255,0.07);border-left:3px solid var(--accent);border-radius:var(--r-sm);font-size:12px;color:var(--muted);line-height:1.5">
-        <strong style="color:var(--text)">Why recommended:</strong> ${s.why_recommended}
-      </div>` : ''}
-
-      <div style="margin-left:12px;margin-bottom:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent)">
-        💬 1-Click Message Template
-      </div>
-      <div class="msg-block" id="${msgId}">${(s.message_template || '').replace(/\\n/g, '\n')}</div>
-      <div class="msg-footer">
-        <span class="msg-label">Ready to send</span>
-        <button class="btn btn-ghost btn-sm" id="${btnId}" onclick="copySupMsg('${msgId}','${btnId}')">📋 Copy Message</button>
+        <div class="msg-block" id="${msgId}">${msgRaw}</div>
       </div>
     </div>`;
   });
@@ -2406,9 +2536,32 @@ function renderSuppliers(d) {
   showResult('sup-result');
 }
 
+function copyTerm(el, term) {
+  navigator.clipboard.writeText(term).then(() => {
+    const orig = el.innerHTML;
+    el.style.borderColor = 'var(--teal)';
+    el.style.color = 'var(--teal)';
+    el.querySelector('.pill-copy').textContent = '✅ copied!';
+    setTimeout(() => {
+      el.style.borderColor = '';
+      el.style.color = '';
+      el.querySelector('.pill-copy').textContent = 'click to copy';
+    }, 1800);
+  });
+}
+
+function copyAllTerms() {
+  navigator.clipboard.writeText(_allSearchTerms.join('\n')).then(() => {
+    const btn = event.target;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ All Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 2000);
+  });
+}
+
 function copySupMsg(msgId, btnId) {
-  const text = document.getElementById(msgId).innerText;
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(document.getElementById(msgId).innerText).then(() => {
     const btn = document.getElementById(btnId);
     const orig = btn.innerHTML;
     btn.innerHTML = '✅ Copied!';
