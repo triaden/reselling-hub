@@ -2397,7 +2397,7 @@ Return this exact JSON structure:
     {
       "rank": 1,
       "company_name": "Realistic Dongguan/Guangzhou/Yiwu factory name e.g. 'Guangdong Tianlong Garment Co., Ltd.'",
-      "supplier_type": "Manufacturer" or "Trading Company",
+      "supplier_type": "Manufacturer",
       "location": "City, Province, China",
       "trade_assurance": true,
       "gold_supplier": true,
@@ -2416,7 +2416,7 @@ Return this exact JSON structure:
       "main_products": "Brief specific description of their product range",
       "why_recommended": "Specific reason this supplier is a strong match for this exact product",
       "alibaba_search_hint": "The most specific search term to find THIS supplier on Alibaba",
-      "message_template": "Dear [Supplier Name] Team,\\n\\nI came across your company on Alibaba and I'm very interested in your [SPECIFIC PRODUCT] manufacturing capabilities.\\n\\nI'm a US-based reseller and I'm currently evaluating suppliers for [PRODUCT DESCRIPTION]. After reviewing your profile, I believe your factory could be a great long-term partner.\\n\\nI have a few questions before placing an order:\\n\\n1. PRICING: What is your best price per unit for an order of [QTY] pcs? And [QTY x2] pcs?\\n2. SAMPLE: Can I order 1–2 samples to evaluate quality? What is the sample cost including DHL shipping to USA?\\n3. LEAD TIME: What is the production lead time for [QTY] units?\\n4. CUSTOMIZATION: Do you offer private label / custom logo? What is the setup fee?\\n5. QUALITY: What quality control process do you use? Do you have ISO or other certifications?\\n6. PAYMENT: Do you accept Trade Assurance? What payment terms do you offer?\\n\\nI'm ready to move quickly if the sample quality meets my standards. I'm also open to a long-term relationship with consistent monthly orders.\\n\\nLooking forward to your reply.\\n\\nBest regards,\\n[Your Name]\\n[Your Company]"
+      "message_template": "Dear [Supplier Name] Team,[NL][NL]I came across your company on Alibaba and I am very interested in your [SPECIFIC PRODUCT] manufacturing capabilities.[NL][NL]I am a US-based reseller currently evaluating suppliers for [PRODUCT DESCRIPTION]. After reviewing your profile, I believe your factory could be a great long-term partner.[NL][NL]I have a few questions before placing an order:[NL][NL]1. PRICING: What is your best price per unit for an order of [QTY] pcs? And [QTY x2] pcs?[NL]2. SAMPLE: Can I order 1-2 samples to evaluate quality? What is the sample cost including DHL shipping to USA?[NL]3. LEAD TIME: What is the production lead time for [QTY] units?[NL]4. CUSTOMIZATION: Do you offer private label or custom logo? What is the setup fee?[NL]5. QUALITY: What quality control process do you use? Do you have ISO or other certifications?[NL]6. PAYMENT: Do you accept Trade Assurance? What payment terms do you offer?[NL][NL]I am ready to move quickly if the sample quality meets my standards. I am also open to a long-term relationship with consistent monthly orders.[NL][NL]Looking forward to your reply.[NL][NL]Best regards,[NL][Your Name][NL][Your Company]"
     }
   ],
   "sourcing_tips": [
@@ -2429,7 +2429,13 @@ Return this exact JSON structure:
   ]
 }
 
-Make company names sound authentic (include Co., Ltd. or similar). Vary stats realistically across suppliers. The message template must reference the actual product being sourced, not generic placeholders.`,
+Rules:
+- Company names must sound authentic (include Co., Ltd., Technology Co., or similar).
+- Vary all stats realistically across the 5 suppliers — no two should be identical.
+- In message_template, use [NL] as the line-break placeholder — never use actual newlines or \\n inside any JSON string value.
+- Do not use double-quote characters inside any string value — use single quotes or rephrase instead.
+- The message_template must reference the actual product being sourced throughout, not generic [PRODUCT] placeholders.
+- Return ONLY the JSON object. No markdown, no explanation, no code fences.`,
       4096
     );
 
@@ -2464,7 +2470,7 @@ function renderSuppliers(d) {
     const certs     = (s.certifications || []).map(c => `<span class="tag tag-purple" style="font-size:10px">${c}</span>`).join('');
     const msgId     = `sup-msg-${i}`;
     const msgBtnId  = `sup-mbtn-${i}`;
-    const msgRaw    = (s.message_template || '').replace(/\\n/g, '\n');
+    const msgRaw    = (s.message_template || '').replace(/\[NL\]/g, '\n').replace(/\\n/g, '\n');
 
     grid.innerHTML += `
     <div class="supplier-card">
